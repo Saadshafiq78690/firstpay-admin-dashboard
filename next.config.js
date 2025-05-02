@@ -2,18 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Set output to 'export' for static site generation
-  output: 'export',
+  // Server-side rendering configuration (removing static export)
   
-  // Use empty prefix to ensure proper path resolution in static export
-  assetPrefix: '',
-  
-  // Add trailing slashes for static exports
-  trailingSlash: true,
-  
-  // Disable image optimization for static exports
+  // Disable image optimization if needed
   images: {
-    unoptimized: true,
+    unoptimized: false, // Set to false for server-side rendering
   },
 };
 

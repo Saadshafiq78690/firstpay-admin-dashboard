@@ -288,7 +288,10 @@ type NavItemProps = {
 const NavItem = ({ icon, label, path, collapsed, active, onClick }: NavItemProps) => {
   return (
     <Link href={path} passHref legacyBehavior>
-      <a style={{ textDecoration: 'none', color: 'inherit' }}>
+      <a 
+        onClick={onClick && window.innerWidth < 768 ? onClick : undefined} 
+        style={{ textDecoration: 'none', color: 'inherit' }}
+      >
         <div 
           style={{ 
             display: 'flex', 
