@@ -17,11 +17,13 @@ import {
   FiX,
   FiFileText
 } from 'react-icons/fi';
+import { isBrowser, isMobileViewport, addWindowEventListener, bodyStyles } from '../utils/client-utils';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   // Check if current path matches the menu item
@@ -42,38 +44,46 @@ const Sidebar = () => {
 
   // Handle window resize for responsive behavior
   useEffect(() => {
+    // Set mounted to true when component mounts
+    setMounted(true);
+    
     const handleResize = () => {
-      const mobile = window.innerWidth < 768;
+      const mobile = isMobileViewport();
       setIsMobile(mobile);
       if (mobile) {
         setCollapsed(true);
         if (mobileMenuOpen) {
-          document.body.style.overflow = 'hidden';
-          document.body.classList.add('menu-open');
+          bodyStyles.setOverflow('hidden');
+          bodyStyles.addClass('menu-open');
         } else {
-          document.body.style.overflow = '';
-          document.body.classList.remove('menu-open');
+          bodyStyles.setOverflow('');
+          bodyStyles.removeClass('menu-open');
         }
       } else {
         setCollapsed(false);
-        document.body.style.overflow = '';
-        document.body.classList.remove('menu-open');
+        bodyStyles.setOverflow('');
+        bodyStyles.removeClass('menu-open');
       }
     };
 
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-    
-    // Call handler right away so state gets updated with initial window size
+    // Initial check
     handleResize();
     
-    // Remove event listener on cleanup
+    // Add event listener with cleanup
+    const cleanup = addWindowEventListener('resize', handleResize);
+    
+    // Return cleanup function
     return () => {
-      window.removeEventListener('resize', handleResize);
-      document.body.style.overflow = '';
-      document.body.classList.remove('menu-open');
+      cleanup();
+      bodyStyles.setOverflow('');
+      bodyStyles.removeClass('menu-open');
     };
   }, [mobileMenuOpen]);
+
+  // Don't render UI elements until component is mounted
+  if (!mounted) {
+    return null; // or a loading spinner
+  }
 
   return (
     <>
@@ -286,10 +296,15 @@ type NavItemProps = {
 };
 
 const NavItem = ({ icon, label, path, collapsed, active, onClick }: NavItemProps) => {
+  // Handle onClick event
+  const handleClick = () => {
+    if (onClick) onClick();
+  };
+
   return (
     <Link href={path} passHref legacyBehavior>
       <a 
-        onClick={onClick && window.innerWidth < 768 ? onClick : undefined} 
+        onClick={handleClick} 
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <div 

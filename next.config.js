@@ -2,11 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Server-side rendering configuration (removing static export)
+  // Configure for server-side rendering
+  swcMinify: true,
   
-  // Disable image optimization if needed
+  // Image optimization config
   images: {
-    unoptimized: false, // Set to false for server-side rendering
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+    unoptimized: false,
   },
 };
 
